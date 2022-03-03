@@ -11,6 +11,7 @@ import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
 import { Markdown as Parser } from "~/utils/server/markdown.server";
+import { getPosts } from "~/utils/server/github.server";
 
 import type {
   LinksFunction, 
