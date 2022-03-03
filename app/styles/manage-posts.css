@@ -1,0 +1,108 @@
+.manage {
+    margin: 0;
+    margin-top: 2rem;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    gap: 0.825rem;
+    grid-template-columns: repeat(1, 1fr);
+}
+
+.card {
+    width: 100%;
+    height: 6.5rem;
+    max-height: 7.825rem;
+    background-color: #c4c4c4;
+    border-radius: 0.625rem;
+    box-shadow: 0 0 6.25px rgba(184, 184, 184, 0.398);
+    position: relative;
+    padding-left: 0.325rem;
+    color: black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    cursor: default;
+}
+
+.card section {
+    display: flex;
+    justify-content: space-evenly;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    height: 100%;
+    width: auto;
+    flex-grow: 1;
+    align-content: space-between;
+}
+
+.card .span {
+    position: relative;
+    bottom: 0.2rem;
+    background-color: #f7f44d;
+    border-radius: 0.35rem;
+    padding: 0.1rem 0.325rem;
+    width: max-content;
+}
+
+.card h2 {
+    font-weight: bold;
+    margin-top: 8px;
+    margin: 0;
+    padding: 0;
+}
+
+.card p {
+    font-size: 0.825rem;
+    margin: 0.2rem 0;
+    padding: 0;
+    width: 95%;
+    word-wrap: normal;
+}
+
+.manage-date {
+    font-weight: 500;
+    font-size: 0.825rem;
+    position: relative;
+    top: 0.1275rem;
+}
+
+.card div {
+    position: relative;
+    right: 0.2rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: max-content;
+}
+
+.card div button {
+    border-radius: 0.325rem;
+    border: none;
+    outline: 0;
+    background-color: #c4c4c4;
+    color: black;
+    font-size: 0.95rem;
+    margin: 0 0.25rem 0 0.25rem;
+    padding: 0.5rem 0.5rem;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.card div button:hover {
+    background-color: #e6e6e6;
+}
+
+.manage-btn .delete {
+    color: #cc0000;
+}
+
+.manage-btn .delete:hover {
+    color: #ff0000;
+}

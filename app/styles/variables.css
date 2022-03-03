@@ -1,0 +1,179 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --foreground: hsl(0, 0%, 100%);
+    --background: hsl(250, 24%, 9%);
+    --secondaryBg: hsl(250, 21%, 11%);
+    --blue-100: hsl(220, 55%, 13%);
+    --blue-200: hsl(220, 62%, 25%);
+    --blue-300: hsl(220, 68%, 35%);
+    --blue-400: hsl(220, 72%, 45%);
+    --blue-500: hsl(220, 80%, 55%);
+    --blue-600: hsl(220, 80%, 65%);
+    --blue-700: hsl(220, 80%, 75%);
+    --blue-800: hsl(220, 80%, 85%);
+    --blue-900: hsl(220, 80%, 95%);
+    --gray-100: hsl(246, 18%, 15%);
+    --gray-200: hsl(246, 11%, 22%);
+    --gray-300: hsl(246, 8%, 35%);
+    --gray-400: hsl(246, 7%, 45%);
+    --gray-500: hsl(246, 6%, 55%);
+    --gray-600: hsl(246, 6%, 65%);
+    --gray-700: hsl(246, 6%, 78%);
+    --gray-800: hsl(246, 6%, 87%);
+    --gray-900: hsl(246, 6%, 95%);
+    --red-100: hsl(1, 45%, 12%);
+    --red-200: hsl(1, 55%, 20%);
+    --red-300: hsl(1, 62%, 28%);
+    --red-400: hsl(1, 62%, 35%);
+    --red-500: hsl(1, 62%, 44%);
+    --red-600: hsl(1, 62%, 60%);
+    --red-700: hsl(1, 62%, 76%);
+    --red-800: hsl(1, 64%, 85%);
+    --red-900: hsl(1, 68%, 95%);
+    --pink-100: hsl(270, 40%, 16%);
+    --pink-200: hsl(270, 45%, 24%);
+    --pink-300: hsl(270, 50%, 32%);
+    --pink-400: hsl(270, 55%, 43%);
+    --pink-500: hsl(270, 60%, 52%);
+    --pink-600: hsl(270, 70%, 65%);
+    --pink-700: hsl(270, 70%, 75%);
+    --pink-800: hsl(270, 70%, 85%);
+    --pink-900: hsl(270, 70%, 95%);
+    --green-100: hsl(152, 26%, 11%);
+    --green-200: hsl(152, 32%, 16%);
+    --green-300: hsl(152, 38%, 24%);
+    --green-400: hsl(152, 38%, 34%);
+    --green-500: hsl(152, 38%, 42%);
+    --green-600: hsl(152, 38%, 60%);
+    --green-700: hsl(152, 38%, 70%);
+    --green-800: hsl(152, 38%, 80%);
+    --green-900: hsl(152, 38%, 91%);
+    --yellow-100: hsl(44, 95%, 12%);
+    --yellow-200: hsl(44, 96%, 24%);
+    --yellow-300: hsl(44, 95%, 36%);
+    --yellow-400: hsl(44, 95%, 48%);
+    --yellow-500: hsl(44, 95%, 60%);
+    --yellow-600: hsl(44, 95%, 69%);
+    --yellow-700: hsl(44, 95%, 78%);
+    --yellow-800: hsl(44, 95%, 86%);
+    --yellow-900: hsl(44, 95%, 95%);
+}
+
+/* [theme="light"] {
+    --foreground: hsl(250, 24%, 9%);
+    --background: hsl(0, 0%, 100%);
+    --secondaryBg: hsl(0, 0%, 98%);
+    --blue-100: hsl(220, 80%, 95%);
+    --blue-200: hsl(220, 80%, 85%);
+    --blue-300: hsl(220, 80%, 75%);
+    --blue-400: hsl(220, 80%, 65%);
+    --blue-500: hsl(220, 80%, 55%);
+    --blue-600: hsl(220, 72%, 45%);
+    --blue-700: hsl(220, 68%, 35%);
+    --blue-800: hsl(220, 62%, 25%);
+    --blue-900: hsl(220, 55%, 13%);
+    --gray-100: hsl(246, 6%, 95%);
+    --gray-200: hsl(246, 6%, 87%);
+    --gray-300: hsl(246, 6%, 78%);
+    --gray-400: hsl(246, 6%, 65%);
+    --gray-500: hsl(246, 6%, 55%);
+    --gray-600: hsl(246, 7%, 45%);
+    --gray-700: hsl(246, 8%, 35%);
+    --gray-800: hsl(246, 11%, 22%);
+    --gray-900: hsl(246, 18%, 15%);
+    --red-100: hsl(1, 68%, 95%);
+    --red-200: hsl(1, 64%, 85%);
+    --red-300: hsl(1, 62%, 76%);
+    --red-400: hsl(1, 62%, 60%);
+    --red-500: hsl(1, 62%, 44%);
+    --red-600: hsl(1, 62%, 35%);
+    --red-700: hsl(1, 62%, 28%);
+    --red-800: hsl(1, 55%, 20%);
+    --red-900: hsl(1, 45%, 12%);
+    --pink-100: hsl(270, 70%, 95%);
+    --pink-200: hsl(270, 70%, 85%);
+    --pink-300: hsl(270, 70%, 75%);
+    --pink-400: hsl(270, 70%, 65%);
+    --pink-500: hsl(270, 60%, 52%);
+    --pink-600: hsl(270, 55%, 43%);
+    --pink-700: hsl(270, 50%, 32%);
+    --pink-800: hsl(270, 45%, 24%);
+    --pink-900: hsl(270, 40%, 16%);
+    --green-100: hsl(152, 38%, 91%);
+    --green-200: hsl(152, 38%, 80%);
+    --green-300: hsl(152, 38%, 70%);
+    --green-400: hsl(152, 38%, 60%);
+    --green-500: hsl(152, 38%, 42%);
+    --green-600: hsl(152, 38%, 34%);
+    --green-700: hsl(152, 38%, 24%);
+    --green-800: hsl(152, 32%, 16%);
+    --green-900: hsl(152, 26%, 11%);
+    --yellow-100: hsl(44, 95%, 95%);
+    --yellow-200: hsl(44, 95%, 86%);
+    --yellow-300: hsl(44, 95%, 78%);
+    --yellow-400: hsl(44, 95%, 69%);
+    --yellow-500: hsl(44, 95%, 60%);
+    --yellow-600: hsl(44, 95%, 48%);
+    --yellow-700: hsl(44, 95%, 36%);
+    --yellow-800: hsl(44, 96%, 24%);
+    --yellow-900: hsl(44, 95%, 12%);
+} */
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-family: inherit;
+	vertical-align: baseline;
+}
+
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+
+body {
+	line-height: 1;
+}
+
+ol, ul {
+	list-style: none;
+}
+
+blockquote, q {
+	quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+	content: '';
+	content: none;
+}
+
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+a:any-link {
+    text-decoration: none;
+}

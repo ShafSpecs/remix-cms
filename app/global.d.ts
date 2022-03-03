@@ -1,0 +1,6 @@
+declare module "@mdx-js/mdx"
+declare module "remark-heading-id"
+declare module "remark-torchlight"
+declare module "remark-highlight.js"
+declare module "remark-collapse"
+declare module "remark-emoji"
