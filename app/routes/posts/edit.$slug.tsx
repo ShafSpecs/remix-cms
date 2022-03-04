@@ -76,7 +76,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   
   if(slug === "new") {
     return {
-      data: "",
+      data: null,
     }
   } else {
     const postsInfo = await PostsData();
