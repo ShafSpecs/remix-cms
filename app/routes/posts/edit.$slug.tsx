@@ -11,7 +11,7 @@ import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
 import { Markdown as Parser } from "~/utils/server/markdown.server";
-import { getPosts } from "~/utils/server/github.server";
+import { PostsList } from "~/utils/server/github.server";
 
 import type {
   LinksFunction, 
@@ -45,6 +45,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export const loader: LoaderFunction = async ({ params }) => {
   const slug = params.slug;
+  await PostsList().then(res => console.log(res))
 
   if(slug === "new") {
     return {
