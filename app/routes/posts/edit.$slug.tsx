@@ -11,7 +11,7 @@ import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
 import { Markdown as Parser } from "~/utils/server/markdown.server";
-import { PostsList } from "~/utils/server/github.server";
+import { PostsData } from "~/utils/server/github.server";
 
 import type {
   LinksFunction, 
@@ -38,22 +38,55 @@ export const action: ActionFunction = async ({ request, params }) => {
     const code = body.get("value");
     const res = Parser(code);
     return res;
-  }
+  } 
+
+  // const list = postsInfo.map(async (post: any) => {
+  //   const postContent = await fetch(post.download_url).then((res) =>
+  //     res.text()
+  //   );
+
+  //   return postContent;
+  // });
+  // // Get the front-matter from the post
+  // let yaml = postContent.split("---")[1];
+  // let frontmatter: any = {};
+
+  // // Transform the front-matter into object-ready state
+  // yaml.split(/\r?\n/g).map((line) => {
+  //   if (line.length > 0 && line.includes(":")) {
+  //     let key: string | string[] = line.split(":");
+
+  //     if (key.length > 2) {
+  //       key[1] = key.slice(1).join(":");
+  //       key.splice(-1);
+  //     }
+
+  //     // Push each key-value pair into the data object
+  //     frontmatter[key[0]] = key[1].replace(" ", "");
+  //     return line;
+  //   }
+
+  //   return line;
 
   return { message: "No action" };
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
   const slug = params.slug;
-  await PostsList().then(res => console.log(res))
-
+  
   if(slug === "new") {
     return {
-      content: "",
+      data: "",
     }
   } else {
+    const postsInfo = await PostsData();
+    const currentPost = postsInfo.find((post: any) => post.name.split(".")[0] === slug);
+    const postContent = await fetch(currentPost.download_url).then((res) =>
+      res.text()
+    );
+
     return {
-      content: "Something..."
+      data: postContent,
     }
   }
 };

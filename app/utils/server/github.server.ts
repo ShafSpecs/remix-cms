@@ -33,12 +33,12 @@ async function getPosts() {
   return postDir;
 }
 
-/* 
-*  Extract required post data from the GitHub API response  
-*     
-*/ 
+/*
+ *  Extract required post data from the GitHub API response
+ *
+ */
 
-export async function PostsList() {
+export async function PostsData() {
   const posts = await getPosts();
 
   //@ts-ignore
@@ -47,42 +47,7 @@ export async function PostsList() {
     return { name, download_url, sha };
   });
 
-  const list = await postsInfo.map(async (post: any) => {
-    const postContent = await fetch(post.download_url).then((res) =>
-      res.text()
-    );
-
-    // Get the front-matter from the post
-    let yaml = postContent.split("---")[1];
-    let frontmatter: any = {};
-
-    // Transform the front-matter into object-ready state
-    yaml.split(/\r?\n/g).map((line) => {
-      if (line.length > 0 && line.includes(":")) {
-        let key: string | string[] = line.split(":");
-
-        if (key.length > 2) {
-          key[1] = key.slice(1).join(":");
-          key.splice(-1);
-        }
-
-        // Push each key-value pair into the data object
-        frontmatter[key[0]] = key[1].replace(" ", "");
-        return line;
-      }
-
-      return line;
-    });
-
-    return {
-      name: post.name,
-      sha: post.sha,
-      frontmatter,
-    };
-  });
-
-  console.log(list)
-  return list;
+  return postsInfo
 }
 
 export async function createPost(slug: string) {
