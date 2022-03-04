@@ -150,6 +150,8 @@ export default function App() {
           </section>
         </div>
         <ScrollRestoration />
+        <script src="https://unpkg.com/@highlightjs/cdn-assets@11.4.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script>
         <ExternalScripts />
         <Scripts />
         {process.env.NODE_ENV === "development" && <LiveReload />}

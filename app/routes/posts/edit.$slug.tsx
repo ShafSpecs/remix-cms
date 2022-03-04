@@ -1,20 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  Form,
-  useFetcher,
-  useLoaderData,
-  useTransition,
-} from "remix";
+import { Form, useFetcher, useLoaderData, useTransition } from "remix";
 import { ClientOnly } from "remix-utils";
 import Monaco from "~/utils/client/monaco.client";
 import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
-import { Markdown as Parser } from "~/utils/server/markdown.server";
 import { PostsData } from "~/utils/server/github.server";
+import { MarkdownHandler } from '../../utils/client/markdown.client';
 
 import type {
-  LinksFunction, 
+  LinksFunction,
   ActionFunction,
   LoaderFunction,
   ErrorBoundaryComponent,
@@ -22,125 +17,81 @@ import type {
 import type { WidgetAPI } from "@uploadcare/react-widget";
 
 import style from "../../styles/new.css";
-import frame from "../../styles/iframe.css";
+import github from "../../styles/github.css";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: style }];
+  return [
+    { rel: "stylesheet", href: style },
+    { rel: "stylesheet", href: github },
+  ];
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  request.headers.set("Connection", "keep-alive");
-
-  const body = await request.formData();
-  const { _action, ...values } = Object.fromEntries(body);
-
-  if (_action === "mdx") {
-    const code = body.get("value");
-    const res = Parser(code);
-    return res;
-  } 
-
-  // const list = postsInfo.map(async (post: any) => {
-  //   const postContent = await fetch(post.download_url).then((res) =>
-  //     res.text()
-  //   );
-
-  //   return postContent;
-  // });
-  // // Get the front-matter from the post
-  // let yaml = postContent.split("---")[1];
-  // let frontmatter: any = {};
-
-  // // Transform the front-matter into object-ready state
-  // yaml.split(/\r?\n/g).map((line) => {
-  //   if (line.length > 0 && line.includes(":")) {
-  //     let key: string | string[] = line.split(":");
-
-  //     if (key.length > 2) {
-  //       key[1] = key.slice(1).join(":");
-  //       key.splice(-1);
-  //     }
-
-  //     // Push each key-value pair into the data object
-  //     frontmatter[key[0]] = key[1].replace(" ", "");
-  //     return line;
-  //   }
-
-  //   return line;
-
   return { message: "No action" };
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
   const slug = params.slug;
-  
-  if(slug === "new") {
+
+  if (slug === "new") {
     return {
       loaderData: null,
-    }
+    };
   } else {
     const postsInfo = await PostsData();
-    const currentPost = postsInfo.find((post: any) => post.name.split(".")[0] === slug);
+    const currentPost = postsInfo.find(
+      (post: any) => post.name.split(".")[0] === slug
+    );
     const postContent = await fetch(currentPost.download_url).then((res) =>
       res.text()
     );
 
     return {
       loaderData: postContent,
-    }
+    };
   }
 };
 
-function Post(content: string, frontmatter: string) {
-  return `
-  <link rel="stylesheet" href=${frame}>
-<script src="https://unpkg.com/@highlightjs/cdn-assets@11.4.0/highlight.min.js"></script>
-<script>hljs.highlightAll();</script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.1.0/github-markdown-dark.min.css" integrity="sha512-USRvpT7dJFA7mrRx4+esmy+2mYr8vlgmDLFpkNeVEd+D5CgQvULKPYVnDV97Ywfek+e//HdSA0NlaPe4oqkwfQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />    
-<body>
-    <div class="markdown-body">
-      ${content}
-    </div>
-    </body>
-   `;
-}
-
 export default function New() {
   const { loaderData } = useLoaderData();
-  const fetcher = useFetcher();
   const transition = useTransition();
 
   const rawText = loaderData ? loaderData : "";
-  const content = loaderData ? loaderData.substring(loaderData.indexOf("---", 4) + 3).trim() : "";
-  
+  const content = loaderData
+    ? loaderData.substring(loaderData.indexOf("---", 4) + 3).trim()
+    : "";
+
   // Initiate an empty object for the frontmatter content
-  let frontmatter: any = {}
-  
+  let frontmatter: any = {};
+
   // Get the front-matter from the post
   let yaml: string | null = loaderData ? loaderData.split("---")[1] : null;
 
   // Transform the front-matter into object-ready state
-  yaml && yaml.split(/\r?\n/g).map((line) => {
-    if (line.length > 0 && line.includes(":")) {
-      let key: string | string[] = line.split(":");
+  yaml &&
+    yaml.split(/\r?\n/g).map((line) => {
+      if (line.length > 0 && line.includes(":")) {
+        let key: string | string[] = line.split(":");
 
-      if (key.length > 2) {
-        key[1] = key.slice(1).join(":");
-        key.splice(-1);
+        if (key.length > 2) {
+          key[1] = key.slice(1).join(":");
+          key.splice(-1);
+        }
+
+        // Push each key-value pair into the frontmatter object
+        frontmatter[key[0]] = key[1].replace(" ", "");
+        return line;
       }
-
-      // Push each key-value pair into the frontmatter object
-      frontmatter[key[0]] = key[1].replace(" ", "");
       return line;
-    }
-    return line;
-  });
+    });
 
   const [value, setValue] = useState<string>(rawText);
+  const [md, setMd] = useState<string>(content);
   const [selectedTab, setSelectedTab] = useTabs(["Markdown", "Preview"]);
 
   const editorRef = useRef<HTMLDivElement>(null!);
   const widgetRef = useRef<WidgetAPI | null>(null);
+  const blogRef = useRef<HTMLDivElement>(null!);
 
   return (
     <div className="dive">
@@ -171,10 +122,7 @@ export default function New() {
           </TabSelector>
           <TabSelector
             isActive={selectedTab === "Preview"}
-            onClick={() => {
-              setSelectedTab("Preview");
-              fetcher.submit({ value, _action: "mdx" }, { method: "post" });
-            }}
+            onClick={() => setSelectedTab("Preview")}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -209,7 +157,7 @@ export default function New() {
             </ClientOnly>
           </TabPanel>
           <TabPanel hidden={selectedTab !== "Preview"}>
-            <div>Hello World!</div>
+            <section className="markdown-body" ref={blogRef}></section>
           </TabPanel>
         </div>
         {selectedTab === "Markdown" && (
