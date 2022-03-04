@@ -76,7 +76,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   
   if(slug === "new") {
     return {
-      data: null,
+      loaderData: null,
     }
   } else {
     const postsInfo = await PostsData();
@@ -86,7 +86,7 @@ export const loader: LoaderFunction = async ({ params }) => {
     );
 
     return {
-      data: postContent,
+      loaderData: postContent,
     }
   }
 };
@@ -106,11 +106,37 @@ function Post(content: string, frontmatter: string) {
 }
 
 export default function New() {
-  const loaderData = useLoaderData();
+  const { loaderData } = useLoaderData();
   const fetcher = useFetcher();
   const transition = useTransition();
 
-  const [value, setValue] = useState<string>(loaderData.value);
+  const rawText = loaderData ? loaderData : "";
+  const content = loaderData ? loaderData.substring(loaderData.indexOf("---", 4) + 3).trim() : "";
+  
+  // Initiate an empty object for the frontmatter content
+  let frontmatter: any = {}
+  
+  // Get the front-matter from the post
+  let yaml: string | null = loaderData ? loaderData.split("---")[1] : null;
+
+  // Transform the front-matter into object-ready state
+  yaml && yaml.split(/\r?\n/g).map((line) => {
+    if (line.length > 0 && line.includes(":")) {
+      let key: string | string[] = line.split(":");
+
+      if (key.length > 2) {
+        key[1] = key.slice(1).join(":");
+        key.splice(-1);
+      }
+
+      // Push each key-value pair into the frontmatter object
+      frontmatter[key[0]] = key[1].replace(" ", "");
+      return line;
+    }
+    return line;
+  });
+
+  const [value, setValue] = useState<string>(rawText);
   const [selectedTab, setSelectedTab] = useTabs(["Markdown", "Preview"]);
 
   const editorRef = useRef<HTMLDivElement>(null!);
