@@ -1,12 +1,18 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Form, useFetcher, useLoaderData, useTransition } from "remix";
+import {
+  Form,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+  useTransition,
+} from "remix";
 import { ClientOnly } from "remix-utils";
 import Monaco from "~/utils/client/monaco.client";
 import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
 import { PostsData } from "~/utils/server/github.server";
-import { MarkdownHandler } from '../../utils/client/markdown.client';
+import { MarkdownHandler } from "../../utils/server/markdown.server";
 
 import type {
   LinksFunction,
@@ -27,7 +33,20 @@ export const links: LinksFunction = () => {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  return { message: "No action" };
+  const body = await request.formData();
+
+  const type = body.get("type");
+
+  if (type === "PARSE_MARKDOWN") {
+    const markdown = body.get("markdown");
+    //@ts-ignore
+    const parsed = MarkdownHandler(markdown);
+    return {
+      data: parsed,
+      type: "PARSE_MARKDOWN",
+    };
+  }
+  return { data: "No action", type: "NULL" };
 };
 
 export const loader: LoaderFunction = async ({ params }) => {
@@ -55,6 +74,10 @@ export const loader: LoaderFunction = async ({ params }) => {
 export default function New() {
   const { loaderData } = useLoaderData();
   const transition = useTransition();
+  const fetcher = useFetcher();
+
+  const data = fetcher.data?.data;
+  const type = fetcher.data?.type;
 
   const rawText = loaderData ? loaderData : "";
   const content = loaderData
@@ -87,11 +110,36 @@ export default function New() {
 
   const [value, setValue] = useState<string>(rawText);
   const [md, setMd] = useState<string>(content);
+  const [parsed, setParsed] = useState<string>("");
   const [selectedTab, setSelectedTab] = useTabs(["Markdown", "Preview"]);
 
   const editorRef = useRef<HTMLDivElement>(null!);
   const widgetRef = useRef<WidgetAPI | null>(null);
   const blogRef = useRef<HTMLDivElement>(null!);
+  const firstRender = useRef<boolean>(true);
+
+  useEffect(() => {
+    if (firstRender.current) {
+      firstRender.current = false;
+      return;
+    }
+
+    const post = value.substring(loaderData.indexOf("---", 4) + 3).trim();
+    setMd(post);
+  }, [value, loaderData]);
+
+  useEffect(() => {
+    setInterval(() => {
+      fetcher.submit(
+        { type: "PARSE_MARKDOWN", markdown: md },
+        { method: "post" }
+      );
+    }, 45 * 1000);
+  });
+
+  useEffect(() => {
+    data && type === "PARSE_MARKDOWN" && setParsed(data);
+  }, [data, type]);
 
   return (
     <div className="dive">
@@ -122,7 +170,13 @@ export default function New() {
           </TabSelector>
           <TabSelector
             isActive={selectedTab === "Preview"}
-            onClick={() => setSelectedTab("Preview")}
+            onClick={() => {
+              setSelectedTab("Preview");
+              fetcher.submit(
+                { type: "PARSE_MARKDOWN", markdown: md },
+                { method: "post" }
+              );
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +211,11 @@ export default function New() {
             </ClientOnly>
           </TabPanel>
           <TabPanel hidden={selectedTab !== "Preview"}>
-            <section className="markdown-body" ref={blogRef}></section>
+            <section
+              className="markdown-body"
+              ref={blogRef}
+              dangerouslySetInnerHTML={{ __html: parsed }}
+            ></section>
           </TabPanel>
         </div>
         {selectedTab === "Markdown" && (

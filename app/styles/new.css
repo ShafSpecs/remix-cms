@@ -39,6 +39,10 @@
     margin: 0;
 }
 
+.editor > div {
+    background-color: #0d1117;
+}
+
 .editor-footer {
     border-top: 1px solid var(--gray-200);
     border-radius: 0 0 1rem 1rem;
@@ -148,7 +152,7 @@
     max-width: 980px;
     margin: 0 auto;
     padding: 45px;
-    min-height: 100%;
+    overflow-y: auto;
 }
 
 @media (max-width: 767px) {

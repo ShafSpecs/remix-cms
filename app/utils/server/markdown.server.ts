@@ -1,7 +1,4 @@
-import fs from "fs";
-import { AbbrDictionary } from "./dictionary.client";
-
-const grayMatter = require("gray-matter");
+import { AbbrDictionary } from "../client/dictionary.client";
 const hljs = require("highlight.js");
 
 const md = require("markdown-it")({
