@@ -62,7 +62,7 @@ The model defines what data the app should contain. If the state of this data ch
 
 Going back to our shopping list app, the model would specify what data the list items should contain — item, price, etc. — and what list items are already present.
 
-#### *The View*
+#### The View
 
 The view defines how the app's data should be displayed.
 
