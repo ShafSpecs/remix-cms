@@ -20,6 +20,7 @@
     justify-content: stretch;
     align-items: center;
     margin-bottom: 2rem;
+    overflow-y: auto;
 }
 
 .editor-header {
@@ -142,14 +143,10 @@
     display: none;
 }
 
-.frame {
-    font-family: "Inter";
-}
-
 .markdown-body {
     box-sizing: border-box;
     min-width: 200px;
-    max-width: 980px;
+    height: 35rem;
     margin: 0 auto;
     padding: 45px;
     overflow-y: auto;
@@ -159,4 +156,100 @@
     .markdown-body {
         padding: 15px;
     }
+}
+
+.commit {
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+}
+
+.form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.form > input {
+    width: 100%;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid var(--gray-200);
+    border-radius: 0.5rem;
+    font-size: 0.825rem;
+    color: #999;
+    outline: 0;
+    background-color: var(--background);
+}
+
+.form > input::placeholder {
+    color: var(--gray-300);
+}
+
+.form > button {
+    color: #f1f1f1;
+    background-color: #17640c;
+    cursor: pointer;
+    width: max-content;
+    font-family: "Inter", sans-serif;
+    font-size: 0.9rem;
+    padding: 0.325rem 1rem;
+    margin-top: 0.825rem;
+    margin-left: 0.325rem;
+    outline: 0;
+    border: 0;
+    border-radius: 0.5rem;
+}
+
+.form > button:hover {
+    background-color: #1d8510;
+}
+
+.pop-up {
+    width: max-content;
+    height: 2.25rem;
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.325rem;
+    position: fixed;
+    top: 1rem;
+    margin: 0 auto;
+    left: 42.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    animation: fadein 1s ease-in;
+    z-index: 99999999999;
+}
+
+.success {
+    background-color: #9fff9f;
+    color: #009200;
+    border: 1px solid #009200;
+}
+
+.error {
+    background-color: #ff9f7c;
+    color: #ba3200;
+    border: 1px solid #ba3200;
+}
+
+@keyframes fadein {
+    0% {
+        transform: translateY(0.825rem);
+        opacity: 0;
+    }
+
+    50% {
+        transform: translateY(0.4125rem);
+        opacity: 0.825;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.form > button:disabled {
+    cursor: not-allowed !important;
+    background-color: #425a3e !important;
 }

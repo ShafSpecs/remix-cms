@@ -1,5 +1,7 @@
 import { Octokit } from "@octokit/core";
+import { Octokit as RestOcto } from "@octokit/rest";
 import { Repo } from "../handlers/github-api";
+import sha512 from 'crypto-js/sha512';
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
 
@@ -50,29 +52,34 @@ export async function PostsData() {
   return postsInfo
 }
 
-export async function createPost(slug: string) {
+export async function createPost(slug: string, commit: string, content: string) {
+  const post = Buffer.from(content).toString("base64");
+  const sha = sha512(post).toString();
+
   const createdPost = await octokit.request(
     "PUT /repos/{owner}/{repo}/contents/{path}",
     {
       ...Repo,
       path: `posts/${slug}.md`,
-      message: `Created new post: ${slug}.md`,
-      content: "content",
+      message: commit,
+      content: post
     }
   );
 
   return createdPost;
 }
 
-export async function updatePost(slug: string) {
+export async function updatePost(slug: string, commit: string, content: string, sha: string) {
+  const post = Buffer.from(content).toString("base64");
+
   const updatedPost = await octokit.request(
     "PUT /repos/{owner}/{repo}/contents/{path}",
     {
       ...Repo,
       path: `posts/${slug}.md`,
-      message: `Updated post: ${slug}.md`,
-      content: "content",
-      sha: "sha",
+      message: commit,
+      content: post,
+      sha: sha,
     }
   );
 

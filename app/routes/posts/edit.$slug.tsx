@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   Form,
+  redirect,
   useActionData,
   useFetcher,
   useLoaderData,
@@ -11,8 +12,13 @@ import Monaco from "~/utils/client/monaco.client";
 import { TabSelector } from "~/components/TabSelector";
 import { TabPanel, useTabs } from "~/components/Tab";
 import { Widget } from "@uploadcare/react-widget";
-import { PostsData } from "~/utils/server/github.server";
+import {
+  PostsData,
+  createPost,
+  updatePost,
+} from "~/utils/server/github.server";
 import { MarkdownHandler } from "../../utils/server/markdown.server";
+import { DiGitMerge, DiGitPullRequest } from "react-icons/di";
 
 import type {
   LinksFunction,
@@ -36,8 +42,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   const body = await request.formData();
 
   const type = body.get("type");
+  console.log(type);
 
   if (type === "PARSE_MARKDOWN") {
+    console.log(params.slug);
     const markdown = body.get("markdown");
     //@ts-ignore
     const parsed = MarkdownHandler(markdown);
@@ -45,6 +53,27 @@ export const action: ActionFunction = async ({ request, params }) => {
       data: parsed,
       type: "PARSE_MARKDOWN",
     };
+  } else if (type === "COMMIT_POST") {
+    const message = body.get("message");
+    const sha = body.get("shaValue");
+    const val = body.get("value");
+    const title = body.get("title");
+    const slug = params.slug;
+
+    //@ts-ignore
+    if (slug === "new") {
+      //@ts-ignore
+      const data = await createPost(title, message, val);
+      console.log("Created");
+
+      return redirect("/posts/edit/" + title);
+    } else {
+      //@ts-ignore
+      const data = await updatePost(slug, message, val, sha);
+      console.log("Updated");
+
+      return redirect("/posts/edit/" + title);
+    }
   }
   return { data: "No action", type: "NULL" };
 };
@@ -55,6 +84,7 @@ export const loader: LoaderFunction = async ({ params }) => {
   if (slug === "new") {
     return {
       loaderData: null,
+      sha: null,
     };
   } else {
     const postsInfo = await PostsData();
@@ -67,28 +97,33 @@ export const loader: LoaderFunction = async ({ params }) => {
 
     return {
       loaderData: postContent,
+      sha: currentPost.sha,
     };
   }
 };
 
 export default function New() {
-  const { loaderData } = useLoaderData();
+  const { loaderData, sha } = useLoaderData();
   const transition = useTransition();
   const fetcher = useFetcher();
 
   const data = fetcher.data?.data;
   const type = fetcher.data?.type;
 
-  const rawText = loaderData ? loaderData : "";
+  const rawText = loaderData
+    ? loaderData
+    : `---\nid: uuid\ntitle: Title\ndescription: Description\ndate: 2022-01-01\nslug: post-slug\nimage: "Post's banner URL"\npublished: false\n---\n\n`;
   const content = loaderData
     ? loaderData.substring(loaderData.indexOf("---", 4) + 3).trim()
-    : "";
+    : rawText.substring(rawText.indexOf("---", 4) + 3).trim();
 
   // Initiate an empty object for the frontmatter content
   let frontmatter: any = {};
 
   // Get the front-matter from the post
-  let yaml: string | null = loaderData ? loaderData.split("---")[1] : null;
+  let yaml: string | null = loaderData
+    ? loaderData.split("---")[1]
+    : rawText.split("---")[1];
 
   // Transform the front-matter into object-ready state
   yaml &&
@@ -112,37 +147,139 @@ export default function New() {
   const [md, setMd] = useState<string>(content);
   const [parsed, setParsed] = useState<string>("");
   const [selectedTab, setSelectedTab] = useTabs(["Markdown", "Preview"]);
+  const [slug, setSlug] = useState<string>("");
+  const [status, setStatus] = useState<number>(0);
 
   const editorRef = useRef<HTMLDivElement>(null!);
   const widgetRef = useRef<WidgetAPI | null>(null);
   const blogRef = useRef<HTMLDivElement>(null!);
   const firstRender = useRef<boolean>(true);
+  const commitRef = useRef<HTMLInputElement | null>(null);
+  const submissionRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (firstRender.current) {
+      if (document.referrer.includes("/new")) {
+        setStatus(1);
+        setTimeout(() => {
+          setStatus(0)
+        }, 7000)
+      }
+      setSlug(window.location.pathname.split("/")[3]);
       firstRender.current = false;
       return;
     }
 
-    const post = value.substring(loaderData.indexOf("---", 4) + 3).trim();
+    submissionRef.current && value === rawText
+      ? (submissionRef.current.disabled = true)
+      : submissionRef.current &&
+        value !== rawText &&
+        (submissionRef.current.disabled = false);
+
+    const post = loaderData
+      ? value.substring(loaderData.indexOf("---", 4) + 3).trim()
+      : value.substring(value.indexOf("---", 4) + 3).trim();
     setMd(post);
   }, [value, loaderData]);
 
-  useEffect(() => {
-    setInterval(() => {
-      fetcher.submit(
-        { type: "PARSE_MARKDOWN", markdown: md },
-        { method: "post" }
-      );
-    }, 45 * 1000);
-  });
+  // setInterval(() => {
+  //   fetcher.submit(
+  //     { type: "PARSE_MARKDOWN", markdown: md },
+  //     { method: "post" }
+  //   );
+  // }, 90 * 1000);
 
   useEffect(() => {
-    data && type === "PARSE_MARKDOWN" && setParsed(data);
-  }, [data, type]);
+    console.log(data);
+    if (data && type === "PARSE_MARKDOWN") {
+      setParsed(data);
+      //@ts-ignore
+      blogRef.current.innerHTML = parsed;
+    } else if (data && type === "COMMIT_POST") {
+      if (window.location.pathname.includes("/new"))
+        window.location.pathname = `/posts/edit/${
+          data.content.name.split(".")[0]
+        }`;
+      console.log(data);
+      if (data.status === 200 || data.status === 201) {
+        setStatus(1);
+        setTimeout(() => {
+          setStatus(0);
+        }, 7000);
+      } else if (
+        data.status === 404 ||
+        data.status === 409 ||
+        data.status === 422
+      ) {
+        setStatus(-1);
+        setTimeout(() => {
+          setStatus(0);
+        }, 7000);
+      } else {
+        setStatus(0);
+      }
+    }
+  }, [data, type, parsed]);
+
+  const yamlConverter = async () => {
+    frontmatter = {};
+
+    const yaml = value.split("---")[1];
+    yaml.split(/\r?\n/g).map((line) => {
+      if (line.length > 0 && line.includes(":")) {
+        let key: string | string[] = line.split(":");
+
+        if (key.length > 2) {
+          key[1] = key.slice(1).join(":");
+          key.splice(-1);
+        }
+
+        // Push each key-value pair into the frontmatter object
+        frontmatter[key[0]] = key[1].replace(" ", "");
+        return line;
+      }
+      return line;
+    });
+
+    return frontmatter
+  };
+
+  const commitPost = async () => {
+    const input = commitRef.current?.value;
+    const shaValue = sha ? sha : "";
+    const commitMessage =
+      //@ts-ignore
+      (input.length > 0 && input !== "undefined") ? input : commitRef.current?.placeholder;
+
+    const title = await yamlConverter().then((res: any) => {return res.slug})
+
+    fetcher.submit(
+      //@ts-ignore
+      {
+        type: "COMMIT_POST",
+        //@ts-ignore
+        message: commitMessage,
+        shaValue,
+        value,
+        title: title,
+      },
+      { method: "post" }
+    );
+  };
 
   return (
     <div className="dive">
+      {status === 1 ? (
+        <div className="pop-up success">
+          <DiGitMerge />
+          &nbsp;{`Successfully pushed ${frontmatter.title} to GitHub`}
+        </div>
+      ) : status === -1 ? (
+        <div className="pop-up error">
+          <DiGitPullRequest />
+          &nbsp;{`Failed to push ${frontmatter.title} to GitHub`}
+        </div>
+      ) : null}
       <div className="monaco">
         <div className="editor-header">
           <TabSelector
@@ -240,6 +377,28 @@ export default function New() {
           ref={widgetRef}
           preloader={null}
         />
+      </div>
+      <div className="commit">
+        <Form className="form" onSubmit={commitPost}>
+          <input
+            type="text"
+            placeholder={
+              loaderData ? `Update ${slug}.md post` : `Create a new blog post!`
+            }
+            className="commit-input"
+            name="commit"
+            ref={commitRef}
+          />
+          <button
+            type="submit"
+            className="commit-submit"
+            onClick={commitPost}
+            ref={submissionRef}
+            disabled
+          >
+            {loaderData ? "Update Post" : "Create Post"}
+          </button>
+        </Form>
       </div>
     </div>
   );
