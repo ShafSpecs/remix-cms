@@ -12,7 +12,7 @@ Search Engine Optimization is a feature lacking in a lot of today's frameworks, 
 
 ## <u>How:</u>
 
-Remix makes use of a special tag `<Meta />` that is stored in the root of your project (if you want SEO available, that is) and it is used *once*. 
+Remix makes use of a special, refined tag `<Meta />` that is stored in the root of your project (if you want SEO available, that is) and it is used *once*. 
 ```js
 import { Meta, Outlet } from "remix";
 
