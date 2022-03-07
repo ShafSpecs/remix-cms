@@ -27,7 +27,7 @@ Let's inspect some code and get our hands greasy. Let's go over what a "loader" 
 
 *Each route has their loader, so each route handles their calls, responses, errors independently and asynchronously* 🔥.
 
-This function is only ever run on the server. On the initial server render it will provide data to the HTML document. On navigations in the browser, Remix will call the function via fetch. This means you can talk directly to your database, use server only API secrets, etc. A seperate article would be coming out soon on the server-side things of Remix, this article would also be updated to include it for further info.
+This function (loaders) is only ever run on the server. On the initial server render it will provide data to the HTML document. On navigations in the browser, Remix will call the function via fetch. This means you can talk directly to your database, use server only API secrets, etc. A seperate article would be coming out soon on the server-side things of Remix, this article would also be updated to include it for further info.
 
 Throwing an error from a loader can be handled from inside the loader itself, take the following as an example:
 ```js
