@@ -10,7 +10,7 @@ published: true
 
 Errors are an embedded part of our lifecycle in programming and like it or not, you run into plenty. With Remix 💿, things have been simplified a great deal but, by how much? Welcome to Error handling in Remix where we would cover how to address common errors we run into and how to use Remix to handle them.
 
-## <u>404 Errors & Similar 🚫:</u>
+## 404 Errors & Similar 🚫:
 
 One of the most common errors you would see when working with remix is the 404 error, thrown by the server when the specified route isn't found. There are two reasons this can happen in Remix: 
 
@@ -169,7 +169,7 @@ To straighten some new terms up there, `useParams()` allow us to access the para
 
 **Thrown errors are always handled by their nearest CatchBoundary function**, so you can dynamically choose to shut down a whole section of a page or keep the page running, your call! There you go, customization in your hands, browser is happy, user is happy, developer is happy and SEO is happy, and no one gets grumpy. Everyone is happy. 
 
-## <u>Unforseen, Surprise Errors 💥:</u>
+## Unforseen, Surprise Errors 💥:
 
 Errors like this sometimes happen, thrown from the server or the browser or even a `loader`, and your site goes puff. In Remix, these nasty errors are caught by Remix 🥳 and then, it's up to you to deal with them. So, let's go deal with 'em errors.
 
