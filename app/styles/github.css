@@ -10,7 +10,8 @@
     line-height: 1.5;
     word-wrap: break-word;
     overflow-y: auto;
-    height: 35rem;
+    height: 35.5rem;
+    width: 100%;
 }
 
 .markdown-body .octicon {
@@ -833,6 +834,11 @@
     line-height: 1.45;
     background-color: #161b22;
     border-radius: 6px;
+}
+
+.markdown-body .highlight pre:hover,
+.markdown-body pre:hover {
+    background-color: #1e232b;
 }
 
 .markdown-body pre code,

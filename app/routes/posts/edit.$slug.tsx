@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
   Form,
+  json,
   redirect,
-  useActionData,
   useFetcher,
   useLoaderData,
   useTransition,
@@ -16,9 +16,16 @@ import {
   PostsData,
   createPost,
   updatePost,
+  Md,
 } from "~/utils/server/github.server";
 import { MarkdownHandler } from "../../utils/server/markdown.server";
 import { DiGitMerge, DiGitPullRequest } from "react-icons/di";
+import {
+  getSession,
+  commitSession,
+  destroySession,
+} from "~/utils/server/session.server";
+import { supabase } from "~/utils/handlers/Supabase";
 
 import type {
   LinksFunction,
@@ -42,15 +49,14 @@ export const action: ActionFunction = async ({ request, params }) => {
   const body = await request.formData();
 
   const type = body.get("type");
-  console.log(type);
 
   if (type === "PARSE_MARKDOWN") {
-    console.log(params.slug);
     const markdown = body.get("markdown");
     //@ts-ignore
-    const parsed = MarkdownHandler(markdown);
+    // const parsed = MarkdownHandler(markdown);
+    const parsed = await Md(markdown);
     return {
-      data: parsed,
+      data: parsed.data,
       type: "PARSE_MARKDOWN",
     };
   } else if (type === "COMMIT_POST") {
@@ -58,52 +64,77 @@ export const action: ActionFunction = async ({ request, params }) => {
     const sha = body.get("shaValue");
     const val = body.get("value");
     const title = body.get("title");
+    const published = body.get("published");
     const slug = params.slug;
+
+    const session = request.headers.get("Cookie");
+    const sessionData = await getSession(session);
 
     //@ts-ignore
     if (slug === "new") {
       //@ts-ignore
-      const data = await createPost(title, message, val);
-      console.log("Created");
+      const data = await createPost(title, message, val, published);
+      sessionData.set("new", true);
+      sessionData.set("redirect", true);
 
-      return redirect("/posts/edit/" + title);
+      return redirect("/posts/edit/" + title, {
+        headers: {
+          "Set-Cookie": await commitSession(sessionData),
+        },
+      });
     } else {
       //@ts-ignore
-      const data = await updatePost(slug, message, val, sha);
-      console.log("Updated");
+      const data = await updatePost(slug, message, val, sha, published);
+      sessionData.set("new", false);
+      sessionData.set("redirect", true);
 
-      return redirect("/posts/edit/" + title);
+      return redirect("/posts/edit/" + title, {
+        headers: {
+          "Set-Cookie": await commitSession(sessionData),
+        },
+      });
     }
   }
   return { data: "No action", type: "NULL" };
 };
 
-export const loader: LoaderFunction = async ({ params }) => {
+export const loader: LoaderFunction = async ({ params, request }) => {
   const slug = params.slug;
 
   if (slug === "new") {
     return {
       loaderData: null,
       sha: null,
+      new: null,
     };
   } else {
     const postsInfo = await PostsData();
     const currentPost = postsInfo.find(
       (post: any) => post.name.split(".")[0] === slug
     );
-    const postContent = await fetch(currentPost.download_url).then((res) =>
-      res.text()
-    );
+    const postContent = currentPost.content;
+
+    const session = await getSession(request.headers.get("Cookie"));
+    if (
+      !session.has("redirect") ||
+      session.get("redirect") === false ||
+      !session.has("new")
+    ) {
+      request.headers.set("Cookie", await destroySession(session));
+    }
+
+    const newInfo = session.get("new");
 
     return {
       loaderData: postContent,
       sha: currentPost.sha,
+      new: newInfo,
     };
   }
 };
 
 export default function New() {
-  const { loaderData, sha } = useLoaderData();
+  const { loaderData, sha, new: newExists } = useLoaderData();
   const transition = useTransition();
   const fetcher = useFetcher();
 
@@ -162,8 +193,8 @@ export default function New() {
       if (document.referrer.includes("/new")) {
         setStatus(1);
         setTimeout(() => {
-          setStatus(0)
-        }, 7000)
+          setStatus(0);
+        }, 7000);
       }
       setSlug(window.location.pathname.split("/")[3]);
       firstRender.current = false;
@@ -182,44 +213,34 @@ export default function New() {
     setMd(post);
   }, [value, loaderData]);
 
-  // setInterval(() => {
-  //   fetcher.submit(
-  //     { type: "PARSE_MARKDOWN", markdown: md },
-  //     { method: "post" }
-  //   );
-  // }, 90 * 1000);
-
   useEffect(() => {
-    console.log(data);
     if (data && type === "PARSE_MARKDOWN") {
       setParsed(data);
       //@ts-ignore
       blogRef.current.innerHTML = parsed;
-    } else if (data && type === "COMMIT_POST") {
-      if (window.location.pathname.includes("/new"))
-        window.location.pathname = `/posts/edit/${
-          data.content.name.split(".")[0]
-        }`;
-      console.log(data);
-      if (data.status === 200 || data.status === 201) {
+    }
+  }, [data, type, parsed]);
+
+  useEffect(() => {
+    if (
+      newExists !== null &&
+      //@ts-ignore
+      window.performance.getEntriesByType("navigation")[0].type !==
+        "back_forward"
+    ) {
+      if (sha) {
         setStatus(1);
         setTimeout(() => {
           setStatus(0);
-        }, 7000);
-      } else if (
-        data.status === 404 ||
-        data.status === 409 ||
-        data.status === 422
-      ) {
+        }, 5500);
+      } else {
         setStatus(-1);
         setTimeout(() => {
           setStatus(0);
-        }, 7000);
-      } else {
-        setStatus(0);
+        }, 5500);
       }
     }
-  }, [data, type, parsed]);
+  }, [newExists, sha]);
 
   const yamlConverter = async () => {
     frontmatter = {};
@@ -241,7 +262,7 @@ export default function New() {
       return line;
     });
 
-    return frontmatter
+    return frontmatter;
   };
 
   const commitPost = async () => {
@@ -249,9 +270,16 @@ export default function New() {
     const shaValue = sha ? sha : "";
     const commitMessage =
       //@ts-ignore
-      (input.length > 0 && input !== "undefined") ? input : commitRef.current?.placeholder;
+      input.length > 0 && input !== "undefined"
+        ? input
+        : commitRef.current?.placeholder;
 
-    const title = await yamlConverter().then((res: any) => {return res.slug})
+    const title = await yamlConverter().then((res: any) => {
+      return {
+        title: res.slug,
+        published: res.published,
+      };
+    });
 
     fetcher.submit(
       //@ts-ignore
@@ -261,7 +289,8 @@ export default function New() {
         message: commitMessage,
         shaValue,
         value,
-        title: title,
+        title: title.title,
+        published: title.published,
       },
       { method: "post" }
     );
@@ -383,7 +412,7 @@ export default function New() {
           <input
             type="text"
             placeholder={
-              loaderData ? `Update ${slug}.md post` : `Create a new blog post!`
+              loaderData ? `Update ${slug}.md` : `Create a new blog post!`
             }
             className="commit-input"
             name="commit"
