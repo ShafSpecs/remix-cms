@@ -5,7 +5,7 @@ description: Description
 date: 2022-01-05
 slug: intro-to-remix
 image: "https://ucarecdn.com/8a55f300-8b4f-4285-89a1-b707c02855b6/remixrun.png"
-published: true
+published: false
 ---
 
 # 🔰 Introduction:
