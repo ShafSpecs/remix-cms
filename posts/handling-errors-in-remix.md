@@ -48,7 +48,7 @@ const page = await db.post.findOne({
 
 This is a simple loader function where we get a post's index from a database (*somewhere, I hope*) and we return it to be consumed in that route. It is very possible that page won't be found cause our `params` argument was a hoax and so, nothing was fetched. In that case, we throw an error of status of `404`. *Wait, just that?*. Not really, when the error is thrown, it is "intercepted" by a function in the Remix's app route called `CatchBoundary`.
 
-It is simply a function that runs when a react component or a loader throws an error (*Nice planning ahead, Remix*:) )
+It is simply a function that runs when a react component or a loader throws an error (*Nice planning ahead, Remix*)
 
 ```js
 import { useCatch } from "remix";
