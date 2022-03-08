@@ -5,7 +5,7 @@ description: Description
 date: 2022-01-18
 slug: remix-and-seo
 image: "https://ucarecdn.com/10f15e2b-5754-43d2-9a0d-dd2866a466af/UntitledDesign1.png"
-published: false
+published: true
 ---
 
 Search Engine Optimization is a feature lacking in a lot of today's frameworks, because pages are handled by the client in a lot of cases, search engines ususally don't have the means to access a page's data beforehand. This is something Remix takes care of easily.
