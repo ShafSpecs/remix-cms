@@ -13,7 +13,13 @@ export default function Posts() {
   const ulRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
-    window.location.pathname.includes("/edit/") ? ulRef.current?.children[1].classList.add(activeClassName) : ulRef.current?.children[1].classList.remove(activeClassName);
+    if (window.location.pathname.includes("/edit/")) {
+      ulRef.current?.children[2].classList.remove(activeClassName);
+      ulRef.current?.children[0].classList.remove(activeClassName);
+      ulRef.current?.children[1].classList.add(activeClassName);
+    } else {
+      ulRef.current?.children[1].classList.remove(activeClassName);
+    }
   });
 
   return (
@@ -36,7 +42,7 @@ export default function Posts() {
             className={({ isActive }) => (isActive ? activeClassName : "")}
             end={false}
             reloadDocument={true}
-            >
+          >
             <li>Write a post</li>
           </NavLink>
           <NavLink
