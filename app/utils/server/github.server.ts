@@ -1,5 +1,6 @@
 import { Octokit } from "@octokit/core";
 import { Repo } from "../handlers/github-api";
+import moment from 'moment';
 const grayMatter = require("gray-matter")
 
 const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
@@ -165,4 +166,16 @@ export async function Md(text: any) {
   });
 
   return texts;
+}
+
+export async function getCommit () {
+  const oldDate = moment().subtract(2, "months").toISOString();
+
+  const commits = await octokit.request("GET /repos/{owner}/{repo}/commits", {
+    ...Repo,
+    path: "posts",
+    since: oldDate
+  })
+
+  return commits
 }

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link, useLoaderData } from "remix";
 import { DiGitBranch } from "react-icons/di";
 import { PostsData } from "~/utils/server/github.server";
@@ -6,7 +7,6 @@ import { format } from "date-fns";
 import type { LinksFunction, LoaderFunction } from "remix";
 
 import style from "../../styles/manage.css";
-import { useEffect, useRef } from "react";
 
 export const links: LinksFunction = () => {
   return [

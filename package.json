@@ -43,6 +43,7 @@
     "markdown-it-named-code-blocks": "^0.1.0",
     "markdown-it-table-of-contents": "^0.6.0",
     "markdown-it-toc-done-right": "^4.2.0",
+    "moment": "^2.29.1",
     "monaco-themes": "^0.4.0",
     "node-fetch": "^3.2.0",
     "prettier": "^2.5.1",

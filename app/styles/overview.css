@@ -1,0 +1,121 @@
+.overview {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    margin-top: 1rem;
+}
+
+.overview > * {
+    margin-bottom: 0.825rem;
+}
+
+.edited {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+}
+
+
+.streak > div:first-of-type {
+    margin-top: 0.825rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
+}
+
+.streak-card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+}
+
+.streak-card:first-child {
+    margin-left: 0;
+}
+
+.streak-card:last-child {
+    margin-right: 0;
+}
+
+/* Squares */
+.square {
+    height: 3rem;
+    width: 3rem;
+    background: #eeeeeeaa;
+    border-radius: 0.5rem;
+    margin: 0 0.325rem;
+}
+
+.commit-card {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 0.825rem;
+    margin: 1rem 0;
+}
+
+.commit {
+    width: 100%;
+    height: 15rem;
+    background-color: #f2f2f2;
+    /* background: linear-gradient(105deg, #f3f3f3 80%, #0c82d1 80%, #042a72 90%); */
+    /* background: radial-gradient(circle farthest-corner at 0 12%, #f3f3f3 0%, #f5f5f5 70%, #0c82d1  70%);; */
+    color: #111;
+    border-radius: 0.625rem;
+    padding: 0.5rem 0.325rem;
+    position: relative;
+    cursor: default;
+    user-select: none;
+}
+
+.commit h3 {
+    color: #313131;
+    font-size: 1.75rem;
+    width: 75%;
+    margin-top: 0.625rem;
+    margin-left: 0.25rem;
+}
+
+.author {
+    height: 3.25rem;
+    width: 3.25rem;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 3.5rem;
+    left: 0.625rem;
+}
+
+.author > img {
+    object-fit: contain;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+
+.date {
+    position: absolute;
+    left: 4.325rem;
+    bottom: 4.625rem;
+    color: #5a5a5a;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.branch {
+    position: absolute;
+    color: #444;
+    bottom: 3.625rem;
+    right: 0.825rem;
+    font-size: 2.5rem;
+}
+
+.foot {
+    height: 3rem;
+    background: #042a72;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    left: 0;
+    border-radius: 0 0 0.5rem 0.5rem;
+}
