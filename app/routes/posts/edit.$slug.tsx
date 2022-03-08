@@ -77,6 +77,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       sessionData.set("new", true);
       sessionData.set("redirect", true);
 
+      await new Promise((res) => setTimeout(res, 100));
+
       return redirect("/posts/edit/" + title, {
         headers: {
           "Set-Cookie": await commitSession(sessionData),
@@ -87,6 +89,8 @@ export const action: ActionFunction = async ({ request, params }) => {
       const data = await updatePost(slug, message, val, sha, published);
       sessionData.set("new", false);
       sessionData.set("redirect", true);
+
+      await new Promise((res) => setTimeout(res, 100));
 
       return redirect("/posts/edit/" + title, {
         headers: {
@@ -180,6 +184,7 @@ export default function New() {
   const [selectedTab, setSelectedTab] = useTabs(["Markdown", "Preview"]);
   const [slug, setSlug] = useState<string>("");
   const [status, setStatus] = useState<number>(0);
+  const [triggered, setTriggered] = useState<boolean>(false);
 
   const editorRef = useRef<HTMLDivElement>(null!);
   const widgetRef = useRef<WidgetAPI | null>(null);
@@ -189,6 +194,12 @@ export default function New() {
   const submissionRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
+    submissionRef.current && value == rawText && !triggered
+      ? (submissionRef.current.disabled = true)
+      : submissionRef.current &&
+        value !== rawText &&
+        (submissionRef.current.disabled = false);
+
     if (firstRender.current) {
       if (document.referrer.includes("/new")) {
         setStatus(1);
@@ -201,17 +212,11 @@ export default function New() {
       return;
     }
 
-    submissionRef.current && value === rawText
-      ? (submissionRef.current.disabled = true)
-      : submissionRef.current &&
-        value !== rawText &&
-        (submissionRef.current.disabled = false);
-
     const post = loaderData
       ? value.substring(loaderData.indexOf("---", 4) + 3).trim()
       : value.substring(value.indexOf("---", 4) + 3).trim();
     setMd(post);
-  }, [value, loaderData]);
+  }, [value, triggered]);
 
   useEffect(() => {
     if (data && type === "PARSE_MARKDOWN") {
@@ -241,6 +246,11 @@ export default function New() {
       }
     }
   }, [newExists, sha]);
+
+  useEffect(() => {
+    setTriggered(false);
+    value == rawText && setTriggered(false);
+  }, [triggered, value, rawText]);
 
   const yamlConverter = async () => {
     frontmatter = {};
@@ -294,6 +304,10 @@ export default function New() {
       },
       { method: "post" }
     );
+  };
+
+  const triggerBtn = () => {
+    setTriggered(true);
   };
 
   return (
@@ -373,7 +387,7 @@ export default function New() {
         <div className="editor" ref={editorRef}>
           <TabPanel hidden={selectedTab !== "Markdown"}>
             <ClientOnly>
-              <Monaco set={setValue} val={value} />
+              <Monaco set={setValue} val={value} triggerBtn={triggerBtn} />
             </ClientOnly>
           </TabPanel>
           <TabPanel hidden={selectedTab !== "Preview"}>

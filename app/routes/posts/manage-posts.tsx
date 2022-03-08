@@ -25,16 +25,16 @@ export const loader: LoaderFunction = async () => {
 	return frontmatter
 }
 
-export function Card({ title, published }: any) {
+export function Card({ title, published, slug }: any) {
   return (
-    <Link to="/">
+    <Link to={`/posts/edit/${slug}`}>
       <div className="card">
         <h2 className="title">{title}</h2>
         <div className="spans">
           <span>Last Edited: 2 weeks ago</span>
           <span>Published: 2 weeks ago</span>
         </div>
-        <div className="branch">
+        <div className="branch" style={published ? { color: "#008800" } : { color: "#800000" }}>
           <DiGitBranch />
         </div>
       </div>
@@ -48,7 +48,7 @@ export default function Manage() {
     <div className="manage">
       {data.map((post: any) => {
 				return (
-					<Card key={post.id} title={post.title} published={post.published} />
+					<Card key={post.id} title={post.title} published={post.published} slug={post.slug}/>
 				)
 			})}
     </div>

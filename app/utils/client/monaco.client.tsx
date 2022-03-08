@@ -2,7 +2,7 @@ import { useState } from "react";
 import MonacoEditor from "@monaco-editor/react";
 import { ClientOnly } from "remix-utils";
 
-export default function Monaco({ set, val }: any) {
+export default function Monaco({ set, val, triggerBtn }: any) {
   const [value, setValue] = useState(val);
   const options = {
     acceptSuggestionOnCommitCharacter: true,
@@ -76,6 +76,7 @@ export default function Monaco({ set, val }: any) {
         onChange={(val) => {
           setValue(val);
           set(val);
+          triggerBtn();
         }}
         defaultLanguage="markdown"
         loading={<div className="spin"></div>}
