@@ -4,7 +4,7 @@ title: "Creating a PWA with Remix"
 description: "Last week, we dwelled on the potential of cross-platform abilities and a web framework on steroids put together and the results were a bit elaborate. Let's go ahead this week and create a mock app by ourselves using a simple e-commerce app to showcase some of what is possible"
 date: 2022-03-03
 slug: creating-a-pwa-with-remix
-image: "https://ucarecdn.com/8a55f300-8b4f-4285-89a1-b707c02855b6/remixrun.png"
+image: "https://ucarecdn.com/4b38b97d-5214-43ef-905f-e595c4b817e6/matthewsichkarukh94pzyhtbrw.jpg"
 published: true
 ---
 
